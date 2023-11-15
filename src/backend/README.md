@@ -1,44 +1,45 @@
 
 # Функциональность микросервисов
 
-1. practice-task-service - микросервис, отвечающий за загрузку, получение и удаления **заданий по практическим работам** от преподавателей.
+* practice-task-service - микросервис, отвечающий за загрузку, получение и удаления **заданий по практическим работам** от преподавателей.
 
     Его методы:
     1. Получение всех практических
-        GET /api/practice-tasks/
 
-        {
-            json: data
-        }
+           GET /api/practice-tasks/
+
+            {
+                json: data
+            }
     
-    2. Получение одной практической
+    3. Получение одной практической
   
-        GET /api/practice-tasks/{id}
+            GET /api/practice-tasks/{id}
 
-        {
-           json: data
-        }
+            {
+               json: data
+            }
        
-    3. Поиск практических работ
+    4. Поиск практических работ
   
-       GET /api/practice-tasks/search?title="название"&item="предмет"
+           GET /api/practice-tasks/search?title="название"&item="предмет"
 
-       {
-            json: data
-       }
+           {
+               json: data
+           }
 
-    4. Загрузка практической работы
+    5. Загрузка практической работы
   
-       POST /api/practice-tasks
+           POST /api/practice-tasks
 
-       {
-            json: data
-       }
+           {
+               json: data
+           }
     
-    5. Удаление практической работы
+    6. Удаление практической работы
   
-       DELETE /api/practice-tasks/{id}
+           DELETE /api/practice-tasks/{id}
 
-       {
-            json: data
-       }
+           {
+               json: data
+           }
