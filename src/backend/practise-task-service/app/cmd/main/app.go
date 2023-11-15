@@ -2,20 +2,25 @@ package main
 
 import (
 	"log"
+	"mod/internal/handler"
+	"mod/internal/storage"
 	"mod/internal/storage/postgres"
+	"mod/internal/usecase"
 )
 
 func main() {
-	cfg := postgres.Config{
+	db, err := postgres.New(postgres.Config{
 		Host:     "",
 		Port:     "",
 		Username: "",
 		Password: "",
 		DBName:   "",
 		SSLMode:  "",
-	}
-	_, err := postgres.New(cfg)
+	})
 	if err != nil {
-		log.Println("Ошибка в получении подключения к БД - ", err)
+		log.Fatalf("Ошибка в инициалзиации бд - %s", err)
 	}
+	repository := storage.New(db)
+	service := usecase.New(repository)
+	handler := handler.New(service)
 }
