@@ -6,7 +6,8 @@ import (
 )
 
 type PracticeSaver interface {
-	Save(request models.UploadPracticeRequest) (int, error)
+	SaveMetadata(request models.UploadPracticeRequest) (int, error)
+	RecordFile(request models.UploadPracticeRequest) error
 }
 type Service struct {
 	PracticeSaver
@@ -14,6 +15,6 @@ type Service struct {
 
 func New(repo *storage.Repository) *Service {
 	return &Service{
-		PracticeSaver: ,
+		PracticeSaver: NewUploadService(),
 	}
 }
