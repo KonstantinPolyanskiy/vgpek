@@ -2,7 +2,7 @@ package handler
 
 import (
 	"github.com/go-chi/chi/v5"
-	"mod/internal/usecase"
+	"practise-task-service/pkg/usecase"
 )
 
 type Handler struct {
@@ -22,8 +22,8 @@ func (h *Handler) Init() *chi.Mux {
 		r.Get("/practice-tasks", h.GetAllPracticeTask())
 		r.Get("/practice-tasks/{id}", h.GetPractice())
 		r.Get("/practice-tasks/search?title={t}item={i}", h.SearchPractice())
-		r.Post("practice-tasks", h.UploadPractice())
-		r.Delete("practice-tasks/{id}", h.DeletePractice())
+		r.Post("/practice-tasks", h.UploadPractice())
+		r.Delete("/practice-tasks/{id}", h.DeletePractice())
 	})
 
 	return r
