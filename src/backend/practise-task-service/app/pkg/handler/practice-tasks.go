@@ -1,13 +1,15 @@
 package handler
 
 import (
-	"mod/internal/models"
+	"github.com/go-chi/render"
+	"mime/multipart"
 	"net/http"
+	"practise-task-service/pkg/models"
 	"strings"
 )
 
 type PracticeSaver interface {
-	Save(request models.UploadPracticeRequest) (int, error)
+	Save(request models.UploadPracticeRequest, fh *multipart.FileHeader) (int, error)
 }
 
 func (h *Handler) GetAllPracticeTask() http.HandlerFunc {
@@ -50,6 +52,18 @@ func (h *Handler) UploadPractice() http.HandlerFunc {
 
 		upload.File = file
 		upload.FileSize = handler.Size
+		handler.Filename = "save.pdf"
+
+		id, err := h.service.Save(upload, handler)
+		if err != nil {
+			render.JSON(w, r, map[string]interface{}{
+				"ошибка - ": err,
+			})
+		}
+		render.JSON(w, r, map[string]interface{}{
+			"ID сохранненого файла - ": id,
+		})
+
 	}
 }
 
