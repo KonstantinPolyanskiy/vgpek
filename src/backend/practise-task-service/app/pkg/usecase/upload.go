@@ -12,8 +12,8 @@ import (
 )
 
 type Saver interface {
-	SaveMetadata(request models.UploadPracticeRequest) (int, error)
-	RecordFile(practiceFile multipart.File) error
+	SaveMetadata(request models.UploadPracticeRequest, name string) (int, error)
+	RecordFile(practiceFile multipart.File, name string) error
 }
 
 type PracticeMetadata struct {
