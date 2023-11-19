@@ -1,0 +1,133 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    max-width: 1400px;
+
+    margin: auto;
+}
+
+
+/* Стили шапки */
+header {
+    width: 100%;
+
+    padding: 15px;
+}
+
+header > ul {
+    display: flex;
+
+    justify-content: space-around;
+}
+
+header > ul > li {
+    list-style: none;
+}
+
+header a {
+    color: #2395FF;
+    
+    text-decoration: none;
+    
+    font-size: 30px;
+}
+
+header a:visited {
+    color: #2395FF;
+}
+
+#last-practice-works {
+    color: #2395FF;
+}
+
+/* Стилизация компонентов */
+
+/* practice-work */
+
+.practice-work {
+    border: 2px solid #2395FF;
+
+    border-radius: 25px;
+
+    padding: 15px 25px;
+}
+
+/* practice-work - неактивно */
+.practice-work > .short-info {
+    display: flex;
+
+    justify-content: space-between;
+}
+
+.practice-work > .short-info > .title {
+    font-size: 26px;
+
+    color: inherit;
+}
+
+.practice-work > .short-info > .author {
+    font-size: 26px;
+}
+
+.practice-work > .full-info {
+    display: none;
+}
+
+/* practice-work активно */
+
+.practice-work.active {
+    padding-left: 40px;
+    padding-right: 40px;
+
+    padding-bottom: 60px;
+
+    background-color: #2395FF;
+}
+
+.practice-work.active > .short-info {
+    display: none;
+}
+
+.practice-work.active > .full-info {
+    color: white;
+
+    display: block;
+}
+
+.practice-work.active > .full-info {
+    display: flex;
+
+    flex-direction: column;
+}
+
+.practice-work > .full-info > h3 {
+    font-size: 36px;
+
+    text-align: center;
+
+    margin-bottom: 25px;
+}
+
+.practice-work > .full-info > .data {
+    width: 40%;
+}
+
+.practice-work > .full-info .data-block {
+    margin-top: 15px;
+
+    margin-bottom: 15px;
+}
+
+.practice-work > .full-info .data-block h4 {
+    font-size: 36px;
+}
+
+.practice-work > .full-info .data-block p {
+    font-size: 26px;
+
+    margin-top: 15px;
+    margin-left: 25px;
+}
