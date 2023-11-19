@@ -1,15 +1,22 @@
 package handler
 
 import (
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"mime/multipart"
 	"net/http"
 	"practise-task-service/pkg/models"
+	"strconv"
 	"strings"
 )
 
+const DocxExt = ".docx"
+
 type PracticeSaver interface {
 	Save(request models.UploadPracticeRequest, fh *multipart.FileHeader) (int, error)
+}
+type PracticeGetter interface {
+	Get(id int) (models.PracticeFile, error)
 }
 
 func (h *Handler) GetAllPracticeTask() http.HandlerFunc {
@@ -20,7 +27,27 @@ func (h *Handler) GetAllPracticeTask() http.HandlerFunc {
 
 func (h *Handler) GetPractice() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		idParam := chi.URLParam(r, "id")
+		if idParam == "" {
+			NewErrorResponse(w, r, http.StatusBadRequest, "пустой id в запросе")
+			return
+		}
+		id, err := strconv.Atoi(idParam)
+		if err != nil {
+			NewErrorResponse(w, r, http.StatusBadRequest, "не удалось конвертовать в int")
+			return
+		}
 
+		practice, err := h.service.PracticeGetter.Get(id)
+		if err != nil {
+			NewErrorResponse(w, r, http.StatusInternalServerError, "не удалось получить практическую")
+			return
+		}
+
+		w.Header().Set("Content-Disposition", "attachment; filename="+practice.Theme+DocxExt)
+
+		http.ServeFile(w, r, practice.File.Name())
+		defer practice.File.Close()
 	}
 }
 
@@ -52,7 +79,6 @@ func (h *Handler) UploadPractice() http.HandlerFunc {
 
 		upload.File = file
 		upload.FileSize = handler.Size
-		handler.Filename = "save.pdf"
 
 		id, err := h.service.Save(upload, handler)
 		if err != nil {
