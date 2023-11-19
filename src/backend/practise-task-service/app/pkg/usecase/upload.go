@@ -34,8 +34,6 @@ func NewUploadService(repo storage.PracticeSaver) *UploadService {
 }
 
 func (s *UploadService) Save(request models.UploadPracticeRequest, fh *multipart.FileHeader) (int, error) {
-	//TODO: сохранить файл в директорию
-	//TODO: сохранить данные о файле в репозитории
 
 	name := translit.Scientific(fmt.Sprintf("%s %s %s", request.AcademicSubject, request.Title, request.Theme))
 	name = strings.Replace(name, " ", "_", -1)
