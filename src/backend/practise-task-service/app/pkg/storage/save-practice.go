@@ -9,20 +9,20 @@ import (
 	"practise-task-service/pkg/models"
 )
 
-const storagePath = "./pkg/storage/practiceStorageFolder/"
+const StoragePath = "./pkg/storage/practiceStorageFolder/"
 
-type PractiseRepository struct {
+type PractiseSaverRepository struct {
 	db *sqlx.DB
 }
 
 func init() {
-	err := os.Mkdir(storagePath, 0755)
+	err := os.Mkdir(StoragePath, 0755)
 	if err != nil {
 		log.Printf("Ошибка в создании папки - %s\n", err)
 	}
 }
 
-func (r *PractiseRepository) SaveMetadata(request models.UploadPracticeRequest, name string) (int, error) {
+func (r *PractiseSaverRepository) SaveMetadata(request models.UploadPracticeRequest, name string) (int, error) {
 	var practiceID int
 
 	savePracticeInfoQuery := `
@@ -44,7 +44,7 @@ func (r *PractiseRepository) SaveMetadata(request models.UploadPracticeRequest, 
 		return 0, tx.Rollback()
 	}
 
-	err = tx.QueryRow(savePracticeInfoQuery, storagePath+name, "Холодов А.А.", request.Title, request.Theme, request.AcademicSubject).Scan(&practiceID)
+	err = tx.QueryRow(savePracticeInfoQuery, StoragePath+name, "Холодов А.А.", request.Title, request.Theme, request.AcademicSubject).Scan(&practiceID)
 	if err != nil {
 		log.Printf("ошибка в записи практической работы - %s\n", err)
 		return 0, tx.Rollback()
@@ -61,9 +61,8 @@ func (r *PractiseRepository) SaveMetadata(request models.UploadPracticeRequest, 
 	return practiceID, tx.Commit()
 }
 
-func (r *PractiseRepository) RecordFile(practiceFile multipart.File, name string) error {
-
-	dst, err := os.Create(storagePath + name)
+func (r *PractiseSaverRepository) RecordFile(practiceFile multipart.File, name string) error {
+	dst, err := os.Create(StoragePath + name)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -80,8 +79,8 @@ func (r *PractiseRepository) RecordFile(practiceFile multipart.File, name string
 	return nil
 }
 
-func NewPracticeRepository(db *sqlx.DB) *PractiseRepository {
-	return &PractiseRepository{
+func NewPracticeRepository(db *sqlx.DB) *PractiseSaverRepository {
+	return &PractiseSaverRepository{
 		db: db,
 	}
 }
