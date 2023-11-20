@@ -1,4 +1,4 @@
-package handler
+package error_response
 
 import (
 	"github.com/go-chi/render"
