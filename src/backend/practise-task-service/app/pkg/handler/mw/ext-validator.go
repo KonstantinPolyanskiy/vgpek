@@ -16,7 +16,7 @@ func ExtensionValidator(next http.Handler) http.Handler {
 			error_response.NewErrorResponse(w, r, http.StatusInternalServerError, "Не удалось обработать файл")
 			return
 		}
-		if extension(fileHeader) != ".docx" || extension(fileHeader) != ".doc" {
+		if extension(fileHeader) != ".docx" && extension(fileHeader) != ".doc" {
 			error_response.NewErrorResponse(w, r, http.StatusBadRequest, invalidExtension)
 			return
 		}
