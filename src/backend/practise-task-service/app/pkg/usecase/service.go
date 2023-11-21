@@ -12,15 +12,20 @@ type PracticeSaver interface {
 type PracticeGetter interface {
 	Get(id int) (models.PracticeResponse, error)
 }
+type PracticeDeleter interface {
+	Delete(id int) error
+}
 
 type Service struct {
 	PracticeSaver
 	PracticeGetter
+	PracticeDeleter
 }
 
 func New(repo *storage.Repository) *Service {
 	return &Service{
-		PracticeSaver:  NewUploadService(repo.PracticeSaver),
-		PracticeGetter: NewOffloadService(repo.PracticeGetter),
+		PracticeSaver:   NewUploadService(repo.PracticeSaver),
+		PracticeGetter:  NewOffloadService(repo.PracticeGetter),
+		PracticeDeleter: NewDeleterService(repo.PracticeDeleter),
 	}
 }
