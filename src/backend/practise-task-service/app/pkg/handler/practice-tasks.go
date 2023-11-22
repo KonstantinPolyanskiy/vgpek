@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"net/http"
@@ -20,14 +21,9 @@ func (h *Handler) GetAllPracticeTask() http.HandlerFunc {
 
 func (h *Handler) GetPractice() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		idParam := chi.URLParam(r, "id")
-		if idParam == "" {
-			error_response.NewErrorResponse(w, r, http.StatusBadRequest, "пустой id в запросе")
-			return
-		}
-		id, err := strconv.Atoi(idParam)
+		id, err := getId(r)
 		if err != nil {
-			error_response.NewErrorResponse(w, r, http.StatusBadRequest, "не удалось конвертовать в int")
+			error_response.NewErrorResponse(w, r, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -88,14 +84,9 @@ func (h *Handler) UploadPractice() http.HandlerFunc {
 
 func (h *Handler) DeletePractice() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		idParam := chi.URLParam(r, "id")
-		if idParam == "" {
-			error_response.NewErrorResponse(w, r, http.StatusBadRequest, "пустой id в запросе")
-			return
-		}
-		id, err := strconv.Atoi(idParam)
+		id, err := getId(r)
 		if err != nil {
-			error_response.NewErrorResponse(w, r, http.StatusBadRequest, "не удалось конвертовать в int")
+			error_response.NewErrorResponse(w, r, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -109,4 +100,18 @@ func (h *Handler) DeletePractice() http.HandlerFunc {
 			"ID удаленной практической:": id,
 		})
 	}
+}
+
+func getId(r *http.Request) (int, error) {
+	idParam := chi.URLParam(r, "id")
+	if idParam == "" {
+		return 0, errors.New("empty id")
+	}
+
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		return 0, errors.New("invalid id")
+	}
+
+	return id, nil
 }
