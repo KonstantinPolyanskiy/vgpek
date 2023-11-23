@@ -8,12 +8,15 @@ import (
 )
 
 type PracticeGetterRepository struct {
-	db *sqlx.DB
+	savePath, deletePath string
+	db                   *sqlx.DB
 }
 
-func NewPracticeGetterRepository(db *sqlx.DB) *PracticeGetterRepository {
+func NewPracticeGetterRepository(db *sqlx.DB, savePath, deletePath string) *PracticeGetterRepository {
 	return &PracticeGetterRepository{
-		db: db,
+		db:         db,
+		savePath:   savePath,
+		deletePath: deletePath,
 	}
 }
 

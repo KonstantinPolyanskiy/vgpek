@@ -12,14 +12,8 @@ import (
 const StoragePath = "./pkg/storage/practiceStorageFolder/"
 
 type PractiseSaverRepository struct {
-	db *sqlx.DB
-}
-
-func init() {
-	err := os.Mkdir(StoragePath, 0755)
-	if err != nil {
-		log.Printf("Ошибка в создании папки - %s\n", err)
-	}
+	savePath string
+	db       *sqlx.DB
 }
 
 func (r *PractiseSaverRepository) SaveMetadata(request models.UploadPracticeRequest, name string) (int, error) {
@@ -79,8 +73,9 @@ func (r *PractiseSaverRepository) RecordFile(practiceFile multipart.File, name s
 	return nil
 }
 
-func NewPracticeRepository(db *sqlx.DB) *PractiseSaverRepository {
+func NewPracticeRepository(db *sqlx.DB, savePath string) *PractiseSaverRepository {
 	return &PractiseSaverRepository{
-		db: db,
+		db:       db,
+		savePath: savePath,
 	}
 }

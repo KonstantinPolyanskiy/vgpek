@@ -9,12 +9,15 @@ import (
 )
 
 type PracticeDeleterRepository struct {
-	db *sqlx.DB
+	savePath, deletePath string
+	db                   *sqlx.DB
 }
 
-func NewPracticeDeleterRepository(db *sqlx.DB) *PracticeDeleterRepository {
+func NewPracticeDeleterRepository(db *sqlx.DB, savePath, deletePath string) *PracticeDeleterRepository {
 	return &PracticeDeleterRepository{
-		db: db,
+		db:         db,
+		savePath:   savePath,
+		deletePath: deletePath,
 	}
 }
 
