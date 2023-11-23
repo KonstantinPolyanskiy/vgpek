@@ -38,7 +38,7 @@ func (r *PractiseSaverRepository) SaveMetadata(request models.UploadPracticeRequ
 		return 0, tx.Rollback()
 	}
 
-	err = tx.QueryRow(savePracticeInfoQuery, StoragePath+name, "Холодов А.А.", request.Title, request.Theme, request.AcademicSubject).Scan(&practiceID)
+	err = tx.QueryRow(savePracticeInfoQuery, r.savePath, request.Author, request.Title, request.Theme, request.AcademicSubject).Scan(&practiceID)
 	if err != nil {
 		log.Printf("ошибка в записи практической работы - %s\n", err)
 		return 0, tx.Rollback()
@@ -56,7 +56,7 @@ func (r *PractiseSaverRepository) SaveMetadata(request models.UploadPracticeRequ
 }
 
 func (r *PractiseSaverRepository) RecordFile(practiceFile multipart.File, name string) error {
-	dst, err := os.Create(StoragePath + name)
+	dst, err := os.Create(r.savePath + name)
 	if err != nil {
 		log.Println(err)
 		return err
