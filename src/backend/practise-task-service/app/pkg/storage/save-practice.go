@@ -9,8 +9,6 @@ import (
 	"practise-task-service/pkg/models"
 )
 
-const StoragePath = "./pkg/storage/practiceStorageFolder/"
-
 type PractiseSaverRepository struct {
 	savePath string
 	db       *sqlx.DB

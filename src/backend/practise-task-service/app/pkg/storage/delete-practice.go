@@ -6,6 +6,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"log"
 	"os"
+	"time"
 )
 
 type PracticeDeleterRepository struct {
@@ -36,21 +37,14 @@ func (r *PracticeDeleterRepository) DeleteFile(id int) error {
 }
 
 func (r *PracticeDeleterRepository) DeleteInfo(id int) error {
-	deletePracticeAccessQuery := `
-	DELETE FROM practice_access
-	WHERE practice_id=$1
-`
+
 	deletePracticeInfoQuery := `
-	DELETE FROM practice_info
-	WHERE id=$1
+	UPDATE practice_info
+	SET deleted_at=$1
+	WHERE id=$2
 `
 
-	_, err := r.db.Exec(deletePracticeAccessQuery, id)
-	if err != nil {
-		return err
-	}
-
-	_, err = r.db.Exec(deletePracticeInfoQuery, id)
+	_, err := r.db.Exec(deletePracticeInfoQuery, time.Now(), id)
 	if err != nil {
 		return err
 	}
@@ -64,7 +58,7 @@ func getFilePath(id int, db *sqlx.DB) (string, error) {
 	getPathQuery := `
 	SELECT relative_path 
 	FROM practice_info
-	WHERE id=$1
+	WHERE id=$1 AND deleted_at IS NOT NULL
 `
 
 	err := db.Get(&path, getPathQuery, id)

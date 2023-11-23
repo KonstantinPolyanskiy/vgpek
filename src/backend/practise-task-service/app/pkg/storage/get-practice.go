@@ -26,7 +26,7 @@ func (r *PracticeGetterRepository) GetPracticeInfo(id int) (models.PracticeInfo,
 	getPracticeInfoQuery := `
 	SELECT author, title, theme, academic_subject
 	FROM practice_info
-	WHERE id=$1
+	WHERE id=$1 AND deleted_at IS NOT NULL
 `
 	err := r.db.Get(&info, getPracticeInfoQuery, id)
 	if err != nil {
@@ -42,7 +42,9 @@ func (r *PracticeGetterRepository) GetPracticeFile(id int) (models.PracticeFile,
 	var practiceFile models.PracticeFile
 
 	getPracticePathQuery := `
-	SELECT relative_path FROM practice_info WHERE id=$1
+	SELECT relative_path 
+	FROM practice_info 
+	WHERE id=$1 AND deleted_at IS NOT NULL
 `
 	err := r.db.Get(&path, getPracticePathQuery, id)
 	if err != nil {
