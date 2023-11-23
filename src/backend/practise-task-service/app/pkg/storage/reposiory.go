@@ -29,10 +29,10 @@ type Repository struct {
 	PracticeDeleter
 }
 
-func New(db *sqlx.DB) *Repository {
+func New(db *sqlx.DB, savePath, deletePath string) *Repository {
 	return &Repository{
-		PracticeSaver:   NewPracticeRepository(db),
-		PracticeGetter:  NewPracticeGetterRepository(db),
-		PracticeDeleter: NewPracticeDeleterRepository(db),
+		PracticeSaver:   NewPracticeRepository(db, savePath),
+		PracticeGetter:  NewPracticeGetterRepository(db, savePath, deletePath),
+		PracticeDeleter: NewPracticeDeleterRepository(db, savePath, deletePath),
 	}
 }

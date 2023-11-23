@@ -26,6 +26,19 @@ func main() {
 		log.Fatalf("Ошибка в чтении cfg - %s\n", err)
 	}
 
+	savedPath := viper.GetString("folder.save")
+	deletedPath := viper.GetString("folder.delete")
+
+	err = os.Mkdir(savedPath, 0755)
+	if err != nil {
+		log.Printf("Ошибка в создании папки - %s\n", err)
+	}
+
+	err = os.Mkdir(deletedPath, 0755)
+	if err != nil {
+		log.Printf("Ошибка в создании папки - %s\n", err)
+	}
+
 	db, err := postgres.New(postgres.Config{
 		Host:     viper.GetString("db.host"),
 		Port:     viper.GetString("db.port"),
@@ -37,7 +50,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Ошибка в инициалзиации бд - %s", err)
 	}
-	repo := storage.New(db)
+	repo := storage.New(db, savedPath, deletedPath)
 	service := usecase.New(repo)
 	handlers := handler.New(service)
 
