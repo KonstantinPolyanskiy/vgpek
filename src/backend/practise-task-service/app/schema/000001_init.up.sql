@@ -4,7 +4,8 @@ CREATE TABLE practice_info (
   Author varchar,
   Title varchar,
   Theme varchar,
-  Academic_Subject varchar
+  Academic_Subject varchar,
+  Deleted_at timestamp default null
 );
 CREATE TABLE access_groups (
     Group_Id SERIAL PRIMARY KEY,
