@@ -6,6 +6,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"log"
 	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -28,7 +29,9 @@ func (r *PracticeDeleterRepository) DeleteFile(id int) error {
 		return err
 	}
 
-	err = os.Remove(path)
+	name := filepath.Base(path)
+
+	err = os.Rename(path, r.deletePath+name)
 	if err != nil {
 		return err
 	}
@@ -52,13 +55,14 @@ func (r *PracticeDeleterRepository) DeleteInfo(id int) error {
 	return nil
 }
 
+// Возвращает из базы данных путь к файлу (даже если он помечен как удаленный)
 func getFilePath(id int, db *sqlx.DB) (string, error) {
 	var path string
 
 	getPathQuery := `
 	SELECT relative_path 
 	FROM practice_info
-	WHERE id=$1 AND deleted_at IS NOT NULL
+	WHERE id=$1
 `
 
 	err := db.Get(&path, getPathQuery, id)

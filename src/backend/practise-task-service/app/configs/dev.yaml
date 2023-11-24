@@ -1,8 +1,11 @@
+folder:
+  save: "./saved-Practice/"
+  delete: "./deleted-Practice/"
 http_server:
   address: "0.0.0.0:3000"
   timeout: 4s
   idle_timeout: 90s
 db:
-  host: "localhost"
+  host: "db"
   sslmode: "disable"
   port: "5432"
