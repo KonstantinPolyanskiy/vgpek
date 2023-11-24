@@ -61,6 +61,7 @@ func (h *Handler) UploadPractice() http.HandlerFunc {
 
 		upload := models.UploadPracticeRequest{
 			Title:           r.FormValue("title"),
+			Author:          r.FormValue("author"),
 			Theme:           r.FormValue("theme"),
 			AcademicSubject: r.FormValue("academicSubject"),
 			AccessGroup:     strings.Split(r.FormValue("accessGroup"), ","),
