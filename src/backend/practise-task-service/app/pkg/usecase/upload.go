@@ -46,6 +46,10 @@ func (s *UploadService) Save(request models.UploadPracticeRequest, fh *multipart
 	}
 
 	id, err := s.repo.SaveMetadata(request, name)
+	if err != nil {
+		log.Printf("Ошибка в записи информации о практической - %s\n", err)
+		return 0, err
+	}
 
 	return id, nil
 }
