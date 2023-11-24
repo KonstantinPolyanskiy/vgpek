@@ -5,11 +5,6 @@ import (
 	"practise-task-service/pkg/storage"
 )
 
-type Getter interface {
-	GetPracticeInfo()
-	GetPracticeFile()
-}
-
 type OffloadService struct {
 	repo storage.PracticeGetter
 }
@@ -35,4 +30,13 @@ func (s *OffloadService) Get(id int) (models.PracticeResponse, error) {
 		PracticeInfo: info,
 		PracticeFile: file,
 	}, nil
+}
+
+func (s *OffloadService) GetGroup() (models.PracticesInfo, error) {
+	info, err := s.repo.GetPracticeGroupInfo()
+	if err != nil {
+		return models.PracticesInfo{}, err
+	}
+
+	return info, nil
 }

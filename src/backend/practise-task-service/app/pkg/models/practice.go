@@ -14,6 +14,8 @@ type PracticeInfo struct {
 	AcademicSubject string `json:"academicSubject" db:"academic_subject"`
 }
 
+type PracticesInfo []PracticeInfo
+
 type PracticeFile struct {
 	File os.File
 }

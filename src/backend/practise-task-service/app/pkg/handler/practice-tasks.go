@@ -15,7 +15,13 @@ const DocxExt = ".docx"
 
 func (h *Handler) GetAllPracticeTask() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		practices, err := h.service.PracticeGetter.GetGroup()
+		if err != nil {
+			error_response.NewErrorResponse(w, r, http.StatusInternalServerError, err.Error())
+			return
+		}
 
+		render.JSON(w, r, practices)
 	}
 }
 

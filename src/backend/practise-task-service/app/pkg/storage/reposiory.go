@@ -13,6 +13,7 @@ type PracticeSaver interface {
 type PracticeGetter interface {
 	GetPracticeInfo(id int) (models.PracticeInfo, error)
 	GetPracticeFile(id int) (models.PracticeFile, error)
+	GetPracticeGroupInfo() (models.PracticesInfo, error)
 }
 
 // PracticeDeleter отвечает за работу по удалению практических работ.

@@ -61,3 +61,23 @@ func (r *PracticeGetterRepository) GetPracticeFile(id int) (models.PracticeFile,
 	practiceFile.File = *file
 	return practiceFile, nil
 }
+
+func (r *PracticeGetterRepository) GetPracticeGroupInfo() (models.PracticesInfo, error) {
+	var practicesInfo models.PracticesInfo
+
+	getPracticesInfoQuery := `
+	SELECT author, title, theme, academic_subject
+	FROM practice_info
+	WHERE deleted_at IS NULL
+	ORDER BY id
+	LIMIT 50
+`
+
+	err := r.db.Select(&practicesInfo, getPracticesInfoQuery)
+	if err != nil {
+		log.Printf("Ошибка в получении информации о группе практических работ - %s\n", err)
+		return models.PracticesInfo{}, err
+	}
+
+	return practicesInfo, nil
+}
