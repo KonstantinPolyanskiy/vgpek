@@ -3,7 +3,6 @@ package usecase
 import (
 	"fmt"
 	"github.com/essentialkaos/translit/v2"
-	"log"
 	"mime/multipart"
 	"path/filepath"
 	"practise-task-service/internal/models"
@@ -41,13 +40,11 @@ func (s *UploadService) Save(request models.UploadPracticeRequest, fh *multipart
 
 	err := s.repo.RecordFile(request.File, name)
 	if err != nil {
-		log.Printf("Ошибка в записи файла - %s\n", err)
 		return 0, err
 	}
 
 	id, err := s.repo.SaveMetadata(request, name)
 	if err != nil {
-		log.Printf("Ошибка в записи информации о практической - %s\n", err)
 		return 0, err
 	}
 
