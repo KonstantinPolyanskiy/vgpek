@@ -6,7 +6,7 @@ import (
 	"log"
 	"mime/multipart"
 	"os"
-	"practise-task-service/pkg/models"
+	"practise-task-service/internal/models"
 )
 
 type PractiseSaverRepository struct {

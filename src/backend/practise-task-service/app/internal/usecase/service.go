@@ -2,8 +2,8 @@ package usecase
 
 import (
 	"mime/multipart"
-	"practise-task-service/pkg/models"
-	"practise-task-service/pkg/storage"
+	"practise-task-service/internal/models"
+	"practise-task-service/internal/storage"
 )
 
 type PracticeSaver interface {

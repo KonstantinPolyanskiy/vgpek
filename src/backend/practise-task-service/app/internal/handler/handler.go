@@ -2,8 +2,8 @@ package handler
 
 import (
 	"github.com/go-chi/chi/v5"
-	"practise-task-service/pkg/handler/mw"
-	"practise-task-service/pkg/usecase"
+	"practise-task-service/internal/handler/mw"
+	"practise-task-service/internal/usecase"
 )
 
 type Handler struct {

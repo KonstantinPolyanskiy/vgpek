@@ -5,8 +5,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"net/http"
-	"practise-task-service/pkg/handler/error-response"
-	"practise-task-service/pkg/models"
+	"practise-task-service/internal/models"
+	"practise-task-service/pkg/error-response"
 	"strconv"
 	"strings"
 )
@@ -17,7 +17,7 @@ func (h *Handler) GetAllPracticeTask() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		practices, err := h.service.PracticeGetter.GetGroup()
 		if err != nil {
-			error_response.NewErrorResponse(w, r, http.StatusInternalServerError, err.Error())
+			error_response.New(w, r, http.StatusInternalServerError, err.Error())
 			return
 		}
 
@@ -29,13 +29,13 @@ func (h *Handler) GetPractice() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := getId(r)
 		if err != nil {
-			error_response.NewErrorResponse(w, r, http.StatusBadRequest, err.Error())
+			error_response.New(w, r, http.StatusBadRequest, err.Error())
 			return
 		}
 
 		practice, err := h.service.PracticeGetter.Get(id)
 		if err != nil {
-			error_response.NewErrorResponse(w, r, http.StatusInternalServerError, "не удалось получить практическую")
+			error_response.New(w, r, http.StatusInternalServerError, "не удалось получить практическую")
 			return
 		}
 
@@ -53,7 +53,7 @@ func (h *Handler) SearchPractice() http.HandlerFunc {
 
 		practicesInfo, err := h.service.PracticeGetter.GetBySearch(title, academicSubject)
 		if err != nil {
-			error_response.NewErrorResponse(w, r, http.StatusInternalServerError, err.Error())
+			error_response.New(w, r, http.StatusInternalServerError, err.Error())
 			return
 		}
 
@@ -78,7 +78,8 @@ func (h *Handler) UploadPractice() http.HandlerFunc {
 
 		file, handler, err := r.FormFile("file")
 		if err != nil {
-			http.Error(w, "Не удалось получить файл!", http.StatusBadRequest)
+			error_response.New(w, r, http.StatusInternalServerError, err.Error())
+			return
 		}
 		defer file.Close()
 
@@ -87,9 +88,8 @@ func (h *Handler) UploadPractice() http.HandlerFunc {
 
 		id, err := h.service.Save(upload, handler)
 		if err != nil {
-			render.JSON(w, r, map[string]interface{}{
-				"ошибка - ": err,
-			})
+			error_response.New(w, r, http.StatusInternalServerError, err.Error())
+			return
 		}
 		render.JSON(w, r, map[string]interface{}{
 			"ID сохранненого файла - ": id,
@@ -102,13 +102,13 @@ func (h *Handler) DeletePractice() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := getId(r)
 		if err != nil {
-			error_response.NewErrorResponse(w, r, http.StatusBadRequest, err.Error())
+			error_response.New(w, r, http.StatusBadRequest, err.Error())
 			return
 		}
 
 		err = h.service.PracticeDeleter.Delete(id)
 		if err != nil {
-			error_response.NewErrorResponse(w, r, http.StatusInternalServerError, err.Error())
+			error_response.New(w, r, http.StatusInternalServerError, err.Error())
 			return
 		}
 

@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"practise-task-service/pkg/handler"
-	"practise-task-service/pkg/storage"
-	"practise-task-service/pkg/storage/postgres"
-	"practise-task-service/pkg/usecase"
+	"practise-task-service/internal/handler"
+	"practise-task-service/internal/storage"
+	"practise-task-service/internal/storage/postgres"
+	"practise-task-service/internal/usecase"
 	"syscall"
 )
 
@@ -80,4 +80,8 @@ func initConfig() error {
 	viper.SetConfigName("dev")
 
 	return viper.ReadInConfig()
+}
+
+func setupLogger(env string) {
+	if env ==
 }

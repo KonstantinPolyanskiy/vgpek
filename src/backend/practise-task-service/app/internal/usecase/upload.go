@@ -6,8 +6,8 @@ import (
 	"log"
 	"mime/multipart"
 	"path/filepath"
-	"practise-task-service/pkg/models"
-	"practise-task-service/pkg/storage"
+	"practise-task-service/internal/models"
+	"practise-task-service/internal/storage"
 	"strings"
 )
 

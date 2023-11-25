@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"log"
-	"practise-task-service/pkg/storage"
+	"practise-task-service/internal/storage"
 )
 
 type Deleter interface {

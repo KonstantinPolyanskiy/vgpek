@@ -3,7 +3,7 @@ package storage
 import (
 	"github.com/jmoiron/sqlx"
 	"mime/multipart"
-	"practise-task-service/pkg/models"
+	"practise-task-service/internal/models"
 )
 
 type PracticeSaver interface {

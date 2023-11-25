@@ -9,7 +9,7 @@ type ErrResp struct {
 	Message string `json:"message"`
 }
 
-func NewErrorResponse(w http.ResponseWriter, r *http.Request, code int, message string) {
+func New(w http.ResponseWriter, r *http.Request, code int, message string) {
 	w.WriteHeader(code)
 	render.JSON(w, r, ErrResp{Message: message})
 }
