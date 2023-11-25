@@ -20,7 +20,7 @@ services:
       - POSTGRES_PASSWORD=task12345
       - POSTGRES_DB=practice_task_db
     ports:
-      - "5432:5432"
+      - "3300:5432"
     volumes:
       - postgres-db:/var/lib/postgresql/data
 volumes:
