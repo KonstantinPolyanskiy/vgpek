@@ -22,6 +22,7 @@ const (
 	envProd = "prod"
 )
 
+// Инициализирует .env файл
 func init() {
 	if err := godotenv.Load(); err != nil {
 		log.Println(".env не найден")
@@ -63,6 +64,7 @@ func main() {
 	})
 	if err != nil {
 		logger.Error("ошибка в инициалзиации базы данных", log_err.Err(err))
+		panic("error init db")
 	}
 	repo := storage.New(db, savedPath, deletedPath, logger)
 	service := usecase.New(repo)
