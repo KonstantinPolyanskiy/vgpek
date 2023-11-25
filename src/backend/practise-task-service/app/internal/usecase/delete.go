@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"log"
 	"practise-task-service/internal/storage"
 )
 
@@ -23,13 +22,11 @@ func NewDeleterService(repo storage.PracticeDeleter) *DeleterService {
 func (s *DeleterService) Delete(id int) error {
 	err := s.repo.DeleteFile(id)
 	if err != nil {
-		log.Printf("Ошибка в удалении файла - %s\n", err)
 		return err
 	}
 
 	err = s.repo.DeleteInfo(id)
 	if err != nil {
-		log.Printf("Ошибка в удалении информации файла - %s\n", err)
 		return err
 	}
 
