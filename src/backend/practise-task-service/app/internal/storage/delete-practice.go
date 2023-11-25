@@ -4,28 +4,32 @@ import (
 	"errors"
 	"github.com/jackc/pgx/v4"
 	"github.com/jmoiron/sqlx"
-	"log"
+	"log/slog"
 	"os"
 	"path/filepath"
+	log_err "practise-task-service/pkg/logger/error"
 	"time"
 )
 
 type PracticeDeleterRepository struct {
 	savePath, deletePath string
 	db                   *sqlx.DB
+	logger               *slog.Logger
 }
 
-func NewPracticeDeleterRepository(db *sqlx.DB, savePath, deletePath string) *PracticeDeleterRepository {
+func NewPracticeDeleterRepository(db *sqlx.DB, savePath, deletePath string, logger *slog.Logger) *PracticeDeleterRepository {
 	return &PracticeDeleterRepository{
 		db:         db,
 		savePath:   savePath,
 		deletePath: deletePath,
+		logger:     logger,
 	}
 }
 
 func (r *PracticeDeleterRepository) DeleteFile(id int) error {
 	path, err := getFilePath(id, r.db)
 	if err != nil {
+		r.logger.Warn("ошибка получения пути к файлу из базы данных", log_err.Err(err))
 		return err
 	}
 
@@ -33,6 +37,7 @@ func (r *PracticeDeleterRepository) DeleteFile(id int) error {
 
 	err = os.Rename(path, r.deletePath+name)
 	if err != nil {
+		r.logger.Warn("ошибка удаления файла", log_err.Err(err))
 		return err
 	}
 
@@ -49,6 +54,7 @@ func (r *PracticeDeleterRepository) DeleteInfo(id int) error {
 
 	_, err := r.db.Exec(deletePracticeInfoQuery, time.Now(), id)
 	if err != nil {
+		r.logger.Warn("ошибка в изменении статуса практической на <удаленный>", log_err.Err(err))
 		return err
 	}
 
@@ -70,7 +76,6 @@ func getFilePath(id int, db *sqlx.DB) (string, error) {
 		return "", nil
 	}
 	if err != nil {
-		log.Printf("Ошибка в получении пути практической работы - %s\v", err)
 		return "", err
 	}
 

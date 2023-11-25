@@ -2,6 +2,7 @@ package storage
 
 import (
 	"github.com/jmoiron/sqlx"
+	"log/slog"
 	"mime/multipart"
 	"practise-task-service/internal/models"
 )
@@ -31,10 +32,10 @@ type Repository struct {
 	PracticeDeleter
 }
 
-func New(db *sqlx.DB, savePath, deletePath string) *Repository {
+func New(db *sqlx.DB, savePath, deletePath string, Logger *slog.Logger) *Repository {
 	return &Repository{
-		PracticeSaver:   NewPracticeRepository(db, savePath),
-		PracticeGetter:  NewPracticeGetterRepository(db, savePath, deletePath),
-		PracticeDeleter: NewPracticeDeleterRepository(db, savePath, deletePath),
+		PracticeSaver:   NewPracticeRepository(db, savePath, Logger),
+		PracticeGetter:  NewPracticeGetterRepository(db, savePath, deletePath, Logger),
+		PracticeDeleter: NewPracticeDeleterRepository(db, savePath, deletePath, Logger),
 	}
 }

@@ -3,20 +3,24 @@ package storage
 import (
 	"github.com/jmoiron/sqlx"
 	"log"
+	"log/slog"
 	"os"
 	"practise-task-service/internal/models"
+	log_err "practise-task-service/pkg/logger/error"
 )
 
 type PracticeGetterRepository struct {
 	savePath, deletePath string
 	db                   *sqlx.DB
+	logger               *slog.Logger
 }
 
-func NewPracticeGetterRepository(db *sqlx.DB, savePath, deletePath string) *PracticeGetterRepository {
+func NewPracticeGetterRepository(db *sqlx.DB, savePath, deletePath string, logger *slog.Logger) *PracticeGetterRepository {
 	return &PracticeGetterRepository{
 		db:         db,
 		savePath:   savePath,
 		deletePath: deletePath,
+		logger:     logger,
 	}
 }
 
@@ -48,13 +52,13 @@ func (r *PracticeGetterRepository) GetPracticeFile(id int) (models.PracticeFile,
 `
 	err := r.db.Get(&path, getPracticePathQuery, id)
 	if err != nil {
-		log.Printf("Ошибка в получении пути к практической работе - %s\n", err)
+		r.logger.Warn("ошибка в получении пути практической работы", log_err.Err(err))
 		return models.PracticeFile{}, err
 	}
 
 	file, err := os.Open(path)
 	if err != nil {
-		log.Printf("Ошибка в открытии файла - %s\n", err)
+		r.logger.Warn("ошибка в открытии файла практической работы", log_err.Err(err))
 		return models.PracticeFile{}, err
 	}
 
@@ -75,7 +79,7 @@ func (r *PracticeGetterRepository) GetPracticeGroupInfo() (models.PracticesInfo,
 
 	err := r.db.Select(&practicesInfo, getPracticesInfoQuery)
 	if err != nil {
-		log.Printf("Ошибка в получении информации о группе практических работ - %s\n", err)
+		r.logger.Warn("ошибка в получении информации о группе практических работ", log_err.Err(err))
 		return models.PracticesInfo{}, err
 	}
 
@@ -94,7 +98,7 @@ func (r *PracticeGetterRepository) GetPracticeBySearch(title, subject string) (m
 
 	err := r.db.Select(&practicesInfo, getPracticesQuery, title, subject)
 	if err != nil {
-		log.Printf("Ошибка в получении практических по поиску - %s\n", err)
+		r.logger.Warn("ошибка в получении информации по поиску о группе практических работ", log_err.Err(err))
 		return models.PracticesInfo{}, err
 	}
 

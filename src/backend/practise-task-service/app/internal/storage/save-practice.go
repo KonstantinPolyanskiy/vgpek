@@ -3,15 +3,17 @@ package storage
 import (
 	"github.com/jmoiron/sqlx"
 	"io"
-	"log"
+	"log/slog"
 	"mime/multipart"
 	"os"
 	"practise-task-service/internal/models"
+	log_err "practise-task-service/pkg/logger/error"
 )
 
 type PractiseSaverRepository struct {
 	savePath string
 	db       *sqlx.DB
+	logger   *slog.Logger
 }
 
 func (r *PractiseSaverRepository) SaveMetadata(request models.UploadPracticeRequest, name string) (int, error) {
@@ -32,7 +34,7 @@ func (r *PractiseSaverRepository) SaveMetadata(request models.UploadPracticeRequ
 `
 	tx, err := r.db.Begin()
 	if err != nil {
-		log.Printf("ошибка в запуске транзакции - %s\n", err)
+		r.logger.Error("ошибка в запуске транзакции", log_err.Err(err))
 		return 0, tx.Rollback()
 	}
 
@@ -40,14 +42,14 @@ func (r *PractiseSaverRepository) SaveMetadata(request models.UploadPracticeRequ
 		r.savePath+name, request.Author, request.Title, request.Theme, request.AcademicSubject).
 		Scan(&practiceID)
 	if err != nil {
-		log.Printf("ошибка в записи практической работы - %s\n", err)
+		r.logger.Warn("ошибка в записи практической работы", log_err.Err(err))
 		return 0, tx.Rollback()
 	}
 
 	for _, group := range request.AccessGroup {
 		_, err := tx.Exec(saveAccessGroup, practiceID, group)
 		if err != nil {
-			log.Printf("ошибка в записи групп доступа - %s\n", err)
+			r.logger.Warn("ошибка в записи групп доступа", log_err.Err(err))
 			return 0, tx.Rollback()
 		}
 	}
@@ -58,24 +60,24 @@ func (r *PractiseSaverRepository) SaveMetadata(request models.UploadPracticeRequ
 func (r *PractiseSaverRepository) RecordFile(practiceFile multipart.File, name string) error {
 	dst, err := os.Create(r.savePath + name)
 	if err != nil {
-		log.Println(err)
+		r.logger.Warn("ошибка в создании дескриптора файла", log_err.Err(err))
 		return err
 	}
-
 	defer dst.Close()
 
 	_, err = io.Copy(dst, practiceFile)
 	if err != nil {
-		log.Println(err)
+		r.logger.Warn("ошибка в записи файла практической работы", log_err.Err(err))
 		return err
 	}
 
 	return nil
 }
 
-func NewPracticeRepository(db *sqlx.DB, savePath string) *PractiseSaverRepository {
+func NewPracticeRepository(db *sqlx.DB, savePath string, logger *slog.Logger) *PractiseSaverRepository {
 	return &PractiseSaverRepository{
 		db:       db,
 		savePath: savePath,
+		logger:   logger,
 	}
 }
