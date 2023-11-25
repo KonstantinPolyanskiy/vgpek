@@ -1,0 +1,12 @@
+env: "dev"
+folder:
+  save: "./saved-work/"
+  delete: "./deleted-work/"
+http_server:
+  address: "0.0.0.0:3001"
+  timeout: 4s
+  idle_timeout: 90s
+db:
+  host: "localhost"
+  sslmode: "disable"
+  port: "5432"
