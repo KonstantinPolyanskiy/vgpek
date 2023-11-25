@@ -12,6 +12,7 @@ type PracticeSaver interface {
 type PracticeGetter interface {
 	Get(id int) (models.PracticeResponse, error)
 	GetGroup() (models.PracticesInfo, error)
+	GetBySearch(title, subject string) (models.PracticesInfo, error)
 }
 type PracticeDeleter interface {
 	Delete(id int) error

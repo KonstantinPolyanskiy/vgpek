@@ -48,7 +48,16 @@ func (h *Handler) GetPractice() http.HandlerFunc {
 
 func (h *Handler) SearchPractice() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		title := r.URL.Query().Get("title")
+		academicSubject := r.URL.Query().Get("item")
 
+		practicesInfo, err := h.service.PracticeGetter.GetBySearch(title, academicSubject)
+		if err != nil {
+			error_response.NewErrorResponse(w, r, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		render.JSON(w, r, practicesInfo)
 	}
 }
 

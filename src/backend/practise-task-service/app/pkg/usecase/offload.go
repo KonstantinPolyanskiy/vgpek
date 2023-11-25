@@ -40,3 +40,12 @@ func (s *OffloadService) GetGroup() (models.PracticesInfo, error) {
 
 	return info, nil
 }
+
+func (s *OffloadService) GetBySearch(title, subject string) (models.PracticesInfo, error) {
+	practicesInfo, err := s.repo.GetPracticeBySearch(title, subject)
+	if err != nil {
+		return models.PracticesInfo{}, err
+	}
+
+	return practicesInfo, nil
+}

@@ -81,3 +81,22 @@ func (r *PracticeGetterRepository) GetPracticeGroupInfo() (models.PracticesInfo,
 
 	return practicesInfo, nil
 }
+
+func (r *PracticeGetterRepository) GetPracticeBySearch(title, subject string) (models.PracticesInfo, error) {
+	var practicesInfo models.PracticesInfo
+
+	getPracticesQuery := `
+	SELECT author, title, theme, academic_subject 
+	FROM practice_info
+	WHERE to_tsvector('russian', title) @@ to_tsquery('russian', $1)
+	OR to_tsvector('russian', academic_subject) @@ to_tsquery('russian', $2)
+`
+
+	err := r.db.Select(&practicesInfo, getPracticesQuery, title, subject)
+	if err != nil {
+		log.Printf("Ошибка в получении практических по поиску - %s\n", err)
+		return models.PracticesInfo{}, err
+	}
+
+	return practicesInfo, nil
+}
