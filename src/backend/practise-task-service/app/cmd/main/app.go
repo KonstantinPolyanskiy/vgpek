@@ -4,6 +4,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -11,7 +12,14 @@ import (
 	"practise-task-service/internal/storage"
 	"practise-task-service/internal/storage/postgres"
 	"practise-task-service/internal/usecase"
+	log_err "practise-task-service/pkg/logger/error"
+	slog_dev "practise-task-service/pkg/logger/handlers/slog-dev"
 	"syscall"
+)
+
+const (
+	envDev  = "dev"
+	envProd = "prod"
 )
 
 func init() {
@@ -29,14 +37,20 @@ func main() {
 	savedPath := viper.GetString("folder.save")
 	deletedPath := viper.GetString("folder.delete")
 
+	logger := setupLogger(viper.GetString("env"))
+
+	logger.Info(
+		"запуск practice-task microservice",
+		slog.String("окружение", viper.GetString("env")))
+
 	err = os.Mkdir(savedPath, 0755)
 	if err != nil {
-		log.Printf("Ошибка в создании папки - %s\n", err)
+		logger.Warn("ошибка в создании папки", log_err.Err(err))
 	}
 
 	err = os.Mkdir(deletedPath, 0755)
 	if err != nil {
-		log.Printf("Ошибка в создании папки - %s\n", err)
+		logger.Warn("ошибка в создании папки", log_err.Err(err))
 	}
 
 	db, err := postgres.New(postgres.Config{
@@ -48,11 +62,11 @@ func main() {
 		SSLMode:  viper.GetString("db.sslmode"),
 	})
 	if err != nil {
-		log.Fatalf("Ошибка в инициалзиации бд - %s", err)
+		logger.Error("ошибка в инициалзиации базы данных", log_err.Err(err))
 	}
-	repo := storage.New(db, savedPath, deletedPath)
+	repo := storage.New(db, savedPath, deletedPath, logger)
 	service := usecase.New(repo)
-	handlers := handler.New(service)
+	handlers := handler.New(service, logger)
 
 	srv := &http.Server{
 		Addr:         viper.GetString("http_server.address"),
@@ -64,15 +78,16 @@ func main() {
 
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
-	log.Println("Запуск сервера")
+
+	logger.Info("запуск сервера на порту", srv.Addr)
+
 	go func() {
 		if err := srv.ListenAndServe(); err != nil {
-			log.Fatalf("ошибка в запускее сервера - %s\n", err)
+			logger.Error("ошибка в запуске сервера", log_err.Err(err))
 		}
 	}()
 	<-done
-	log.Println("Остановка сервера")
-
+	logger.Info("остановка сервера")
 }
 
 func initConfig() error {
@@ -82,6 +97,7 @@ func initConfig() error {
 	return viper.ReadInConfig()
 }
 
-func setupLogger(env string) {
-	if env ==
+func setupLogger(env string) *slog.Logger {
+	//TODO: настраивать логер в зависимости от окружения
+	return slog_dev.SetupDevSlog()
 }
