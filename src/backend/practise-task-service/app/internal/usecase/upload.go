@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"practise-task-service/internal/models"
 	"practise-task-service/internal/storage"
+	"strings"
 )
 
 type Saver interface {
@@ -33,9 +34,10 @@ func NewUploadService(repo storage.PracticeSaver) *UploadService {
 }
 
 func (s *UploadService) Save(request models.UploadPracticeRequest, fh *multipart.FileHeader) (int, error) {
-	name := translit.ICAO(fmt.Sprintf(
-		"%s_%s_%s_%d_%s",
-		request.AcademicSubject, request.Title, request.Theme, rand.Intn(1000), filepath.Ext(fh.Filename)))
+	name := translit.ICAO(fmt.Sprintf("%s %s %s %d",
+		request.AcademicSubject, request.Title, request.Theme, rand.Intn(10000)))
+	name = strings.Replace(name, " ", "_", -1)
+	name = fmt.Sprintf("%s%s", name, filepath.Ext(fh.Filename))
 
 	err := s.repo.RecordFile(request.File, name)
 	if err != nil {
