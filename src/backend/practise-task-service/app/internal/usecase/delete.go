@@ -4,11 +4,6 @@ import (
 	"practise-task-service/internal/storage"
 )
 
-type Deleter interface {
-	DeleteFile(id int) error
-	DeleteInfo(id int) error
-}
-
 type DeleterService struct {
 	repo storage.PracticeDeleter
 }
@@ -20,12 +15,12 @@ func NewDeleterService(repo storage.PracticeDeleter) *DeleterService {
 }
 
 func (s *DeleterService) Delete(id int) error {
-	err := s.repo.DeleteFile(id)
+	deletedPath, err := s.repo.DeleteInfo(id)
 	if err != nil {
-		return err
+		return nil
 	}
 
-	err = s.repo.DeleteInfo(id)
+	err = s.repo.DeleteFile(id, deletedPath)
 	if err != nil {
 		return err
 	}

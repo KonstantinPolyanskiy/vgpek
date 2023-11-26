@@ -1,6 +1,8 @@
 package storage
 
 import (
+	"errors"
+	"github.com/jackc/pgx/v4"
 	"github.com/jmoiron/sqlx"
 	"log"
 	"log/slog"
@@ -30,7 +32,7 @@ func (r *PracticeGetterRepository) GetPracticeInfo(id int) (models.PracticeInfo,
 	getPracticeInfoQuery := `
 	SELECT author, title, theme, academic_subject
 	FROM practice_info
-	WHERE id=$1 AND deleted_at IS NOT NULL
+	WHERE id=$1 AND deleted_at IS NULL
 `
 	err := r.db.Get(&info, getPracticeInfoQuery, id)
 	if err != nil {
@@ -48,7 +50,7 @@ func (r *PracticeGetterRepository) GetPracticeFile(id int) (models.PracticeFile,
 	getPracticePathQuery := `
 	SELECT relative_path 
 	FROM practice_info 
-	WHERE id=$1 AND deleted_at IS NOT NULL
+	WHERE id=$1 AND deleted_at IS NULL
 `
 	err := r.db.Get(&path, getPracticePathQuery, id)
 	if err != nil {
@@ -92,8 +94,9 @@ func (r *PracticeGetterRepository) GetPracticeBySearch(title, subject string) (m
 	getPracticesQuery := `
 	SELECT author, title, theme, academic_subject 
 	FROM practice_info
-	WHERE to_tsvector('russian', title) @@ to_tsquery('russian', $1)
-	OR to_tsvector('russian', academic_subject) @@ to_tsquery('russian', $2)
+	WHERE deleted_at IS NULL
+	AND (to_tsvector('russian', title) @@ to_tsquery('russian', $1)
+	OR to_tsvector('russian', academic_subject) @@ to_tsquery('russian', $2))
 `
 
 	err := r.db.Select(&practicesInfo, getPracticesQuery, title, subject)
@@ -103,4 +106,25 @@ func (r *PracticeGetterRepository) GetPracticeBySearch(title, subject string) (m
 	}
 
 	return practicesInfo, nil
+}
+
+func (r *PracticeGetterRepository) GetPracticePath(id int) (string, error) {
+	var path string
+
+	getPathQuery := `
+	SELECT relative_path
+	FROM practice_info
+	WHERE id=$1
+`
+
+	err := r.db.Get(&path, getPathQuery, id)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return "", nil
+	}
+	if err != nil {
+		r.logger.Warn("ошибка в получении пути к практической работе", log_err.Err(err))
+		return "", err
+	}
+
+	return path, nil
 }

@@ -4,10 +4,12 @@ import (
 	"errors"
 	"github.com/jackc/pgx/v4"
 	"github.com/jmoiron/sqlx"
+	"log"
 	"log/slog"
 	"os"
 	"path/filepath"
 	log_err "practise-task-service/pkg/logger/error"
+	"strings"
 	"time"
 )
 
@@ -15,27 +17,29 @@ type PracticeDeleterRepository struct {
 	savePath, deletePath string
 	db                   *sqlx.DB
 	logger               *slog.Logger
+	*PracticeGetterRepository
 }
 
-func NewPracticeDeleterRepository(db *sqlx.DB, savePath, deletePath string, logger *slog.Logger) *PracticeDeleterRepository {
+func NewPracticeDeleterRepository(db *sqlx.DB, getterRepository *PracticeGetterRepository, savePath, deletePath string, logger *slog.Logger) *PracticeDeleterRepository {
 	return &PracticeDeleterRepository{
-		db:         db,
-		savePath:   savePath,
-		deletePath: deletePath,
-		logger:     logger,
+		db:                       db,
+		savePath:                 savePath,
+		deletePath:               deletePath,
+		logger:                   logger,
+		PracticeGetterRepository: getterRepository,
 	}
 }
 
-func (r *PracticeDeleterRepository) DeleteFile(id int) error {
-	path, err := getFilePath(id, r.db)
+func (r *PracticeDeleterRepository) DeleteFile(id int, deletedPath string) error {
+	path, err := r.GetPracticePath(id)
 	if err != nil {
-		r.logger.Warn("ошибка получения пути к файлу из базы данных", log_err.Err(err))
 		return err
 	}
-
 	name := filepath.Base(path)
-
-	err = os.Rename(path, r.deletePath+name)
+	log.Println(name)
+	log.Println(r.savePath + name)
+	log.Println(r.deletePath + name)
+	err = os.Rename(r.savePath+name, r.deletePath)
 	if err != nil {
 		r.logger.Warn("ошибка удаления файла", log_err.Err(err))
 		return err
@@ -44,40 +48,27 @@ func (r *PracticeDeleterRepository) DeleteFile(id int) error {
 	return nil
 }
 
-func (r *PracticeDeleterRepository) DeleteInfo(id int) error {
+func (r *PracticeDeleterRepository) DeleteInfo(id int) (string, error) {
+	var deletedPath string
 
-	deletePracticeInfoQuery := `
-	UPDATE practice_info
-	SET deleted_at=$1
-	WHERE id=$2
-`
-
-	_, err := r.db.Exec(deletePracticeInfoQuery, time.Now(), id)
-	if err != nil {
-		r.logger.Warn("ошибка в изменении статуса практической на <удаленный>", log_err.Err(err))
-		return err
-	}
-
-	return nil
-}
-
-// Возвращает из базы данных путь к файлу (даже если он помечен как удаленный)
-func getFilePath(id int, db *sqlx.DB) (string, error) {
-	var path string
-
-	getPathQuery := `
-	SELECT relative_path 
-	FROM practice_info
-	WHERE id=$1
-`
-
-	err := db.Get(&path, getPathQuery, id)
-	if errors.Is(err, pgx.ErrNoRows) {
-		return "", nil
-	}
+	path, err := r.GetPracticePath(id)
 	if err != nil {
 		return "", err
 	}
+	name := filepath.Base(path)
+	name = strings.TrimSuffix(name, filepath.Ext(name))
 
-	return path, nil
+	deletePracticeInfoQuery := `
+	UPDATE practice_info
+	SET deleted_at=$1, relative_path=$2
+	WHERE id=$3
+	RETURNING relative_path
+`
+
+	row := r.db.QueryRow(deletePracticeInfoQuery, time.Now(), r.deletePath+name, id).Scan(&deletedPath)
+	if errors.Is(row, pgx.ErrNoRows) {
+		return "", nil
+	}
+
+	return deletedPath, nil
 }

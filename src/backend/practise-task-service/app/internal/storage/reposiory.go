@@ -16,15 +16,16 @@ type PracticeGetter interface {
 	GetPracticeFile(id int) (models.PracticeFile, error)
 	GetPracticeGroupInfo() (models.PracticesInfo, error)
 	GetPracticeBySearch(title, subject string) (models.PracticesInfo, error)
+	GetPracticePath(id int) (string, error)
 }
 
 // PracticeDeleter отвечает за работу по удалению практических работ.
 // Функции возвращают nil в случае успеха
 type PracticeDeleter interface {
 	// DeleteFile удаляет файл практической работы
-	DeleteFile(id int) error
+	DeleteFile(id int, deletedPath string) error
 	// DeleteInfo удаляет информацию о практической работе
-	DeleteInfo(id int) error
+	DeleteInfo(id int) (string, error)
 }
 type Repository struct {
 	PracticeSaver
@@ -33,9 +34,13 @@ type Repository struct {
 }
 
 func New(db *sqlx.DB, savePath, deletePath string, Logger *slog.Logger) *Repository {
+	Saver := NewPracticeRepository(db, savePath, Logger)
+	Getter := NewPracticeGetterRepository(db, savePath, deletePath, Logger)
+	Deleter := NewPracticeDeleterRepository(db, Getter, savePath, deletePath, Logger)
+
 	return &Repository{
-		PracticeSaver:   NewPracticeRepository(db, savePath, Logger),
-		PracticeGetter:  NewPracticeGetterRepository(db, savePath, deletePath, Logger),
-		PracticeDeleter: NewPracticeDeleterRepository(db, savePath, deletePath, Logger),
+		PracticeSaver:   Saver,
+		PracticeGetter:  Getter,
+		PracticeDeleter: Deleter,
 	}
 }
