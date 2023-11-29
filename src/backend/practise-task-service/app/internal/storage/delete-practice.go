@@ -8,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 	log_err "practise-task-service/pkg/logger/error"
-	"strings"
 	"time"
 )
 
@@ -36,7 +35,7 @@ func (r *PracticeDeleterRepository) DeleteFile(id int, deletedPath string) error
 	}
 	name := filepath.Base(path)
 
-	err = os.Rename(r.savePath+name, r.deletePath)
+	err = os.Rename(r.savePath+name, deletedPath)
 	if err != nil {
 		r.logger.Warn("ошибка удаления файла", log_err.Err(err))
 		return err
@@ -53,7 +52,6 @@ func (r *PracticeDeleterRepository) DeleteInfo(id int) (string, error) {
 		return "", err
 	}
 	name := filepath.Base(path)
-	name = strings.TrimSuffix(name, filepath.Ext(name))
 
 	deletePracticeInfoQuery := `
 	UPDATE practice_info
