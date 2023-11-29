@@ -1,3 +1,4 @@
+env: "dev"
 folder:
   save: "./saved-Practice/"
   delete: "./deleted-Practice/"
@@ -8,4 +9,4 @@ http_server:
 db:
   host: "db"
   sslmode: "disable"
-  port: "5432"
+  port: "3300"
