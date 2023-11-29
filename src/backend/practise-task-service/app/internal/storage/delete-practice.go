@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/jackc/pgx/v4"
 	"github.com/jmoiron/sqlx"
-	"log"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -36,9 +35,7 @@ func (r *PracticeDeleterRepository) DeleteFile(id int, deletedPath string) error
 		return err
 	}
 	name := filepath.Base(path)
-	log.Println(name)
-	log.Println(r.savePath + name)
-	log.Println(r.deletePath + name)
+
 	err = os.Rename(r.savePath+name, r.deletePath)
 	if err != nil {
 		r.logger.Warn("ошибка удаления файла", log_err.Err(err))
