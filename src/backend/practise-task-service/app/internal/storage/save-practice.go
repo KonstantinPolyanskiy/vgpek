@@ -8,6 +8,7 @@ import (
 	"os"
 	"practise-task-service/internal/models"
 	log_err "practise-task-service/pkg/logger/error"
+	"time"
 )
 
 type PractiseSaverRepository struct {
@@ -21,9 +22,9 @@ func (r *PractiseSaverRepository) SaveMetadata(request models.UploadPracticeRequ
 
 	savePracticeInfoQuery := `
 	INSERT INTO practice_info 
-	(relative_path, author, title, theme, academic_subject) 
+	(relative_path, author, title, theme, academic_subject, created_at) 
 	VALUES 
-	($1, $2, $3, $4, $5)
+	($1, $2, $3, $4, $5, $6)
 	RETURNING id
 `
 	saveAccessGroup := `
@@ -39,7 +40,7 @@ func (r *PractiseSaverRepository) SaveMetadata(request models.UploadPracticeRequ
 	}
 
 	err = tx.QueryRow(savePracticeInfoQuery,
-		r.savePath+name, request.Author, request.Title, request.Theme, request.AcademicSubject).
+		r.savePath+name, request.Author, request.Title, request.Theme, request.AcademicSubject, time.Now()).
 		Scan(&practiceID)
 	if err != nil {
 		r.logger.Warn("ошибка в записи практической работы", log_err.Err(err))

@@ -5,6 +5,7 @@ CREATE TABLE practice_info (
   Title varchar,
   Theme varchar,
   Academic_Subject varchar,
+  Created_at timestamp,
   Deleted_at timestamp default null
 );
 CREATE TABLE access_groups (
