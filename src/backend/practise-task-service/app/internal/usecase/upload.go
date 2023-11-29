@@ -24,12 +24,14 @@ type PracticeMetadata struct {
 }
 
 type UploadService struct {
-	repo storage.PracticeSaver
+	saver   storage.PracticeSaver
+	deleter storage.PracticeDeleter
 }
 
-func NewUploadService(repo storage.PracticeSaver) *UploadService {
+func NewUploadService(saver storage.PracticeSaver, deleter storage.PracticeDeleter) *UploadService {
 	return &UploadService{
-		repo: repo,
+		saver:   saver,
+		deleter: deleter,
 	}
 }
 
@@ -39,13 +41,14 @@ func (s *UploadService) Save(request models.UploadPracticeRequest, fh *multipart
 	name = strings.Replace(name, " ", "_", -1)
 	name = fmt.Sprintf("%s%s", name, filepath.Ext(fh.Filename))
 
-	err := s.repo.RecordFile(request.File, name)
+	err := s.saver.RecordFile(request.File, name)
 	if err != nil {
 		return 0, err
 	}
 
-	id, err := s.repo.SaveMetadata(request, name)
+	id, err := s.saver.SaveMetadata(request, name)
 	if err != nil {
+		err = s.deleter.HardDeleteFile(name)
 		return 0, err
 	}
 

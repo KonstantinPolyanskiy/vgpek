@@ -36,7 +36,8 @@ func (r *PractiseSaverRepository) SaveMetadata(request models.UploadPracticeRequ
 	tx, err := r.db.Begin()
 	if err != nil {
 		r.logger.Error("ошибка в запуске транзакции", log_err.Err(err))
-		return 0, tx.Rollback()
+		tx.Rollback()
+		return 0, err
 	}
 
 	err = tx.QueryRow(savePracticeInfoQuery,
@@ -51,7 +52,8 @@ func (r *PractiseSaverRepository) SaveMetadata(request models.UploadPracticeRequ
 		_, err := tx.Exec(saveAccessGroup, practiceID, group)
 		if err != nil {
 			r.logger.Warn("ошибка в записи групп доступа", log_err.Err(err))
-			return 0, tx.Rollback()
+			tx.Rollback()
+			return 0, err
 		}
 	}
 

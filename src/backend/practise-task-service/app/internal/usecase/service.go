@@ -26,7 +26,7 @@ type Service struct {
 
 func New(repo *storage.Repository) *Service {
 	return &Service{
-		PracticeSaver:   NewUploadService(repo.PracticeSaver),
+		PracticeSaver:   NewUploadService(repo.PracticeSaver, repo.PracticeDeleter),
 		PracticeGetter:  NewOffloadService(repo.PracticeGetter),
 		PracticeDeleter: NewDeleterService(repo.PracticeDeleter),
 	}

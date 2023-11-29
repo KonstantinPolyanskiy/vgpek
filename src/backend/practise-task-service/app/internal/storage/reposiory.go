@@ -22,11 +22,15 @@ type PracticeGetter interface {
 // PracticeDeleter отвечает за работу по удалению практических работ.
 // Функции возвращают nil в случае успеха
 type PracticeDeleter interface {
-	// DeleteFile удаляет файл практической работы
+	// DeleteFile мягко удаляет файл практической работы
+	// (перемещает его в другую папку)
 	DeleteFile(id int, deletedPath string) error
-	// DeleteInfo удаляет информацию о практической работе
+	// DeleteInfo мягко удаляет информацию о практической работе
 	DeleteInfo(id int) (string, error)
+	// HardDeleteFile полностью удаляет файл с диска по имени
+	HardDeleteFile(name string) error
 }
+
 type Repository struct {
 	PracticeSaver
 	PracticeGetter

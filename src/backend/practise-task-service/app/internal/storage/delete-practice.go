@@ -67,3 +67,12 @@ func (r *PracticeDeleterRepository) DeleteInfo(id int) (string, error) {
 
 	return deletedPath, nil
 }
+
+func (r *PracticeDeleterRepository) HardDeleteFile(name string) error {
+	err := os.Remove(r.savePath + name)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
