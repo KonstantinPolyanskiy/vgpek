@@ -1,9 +1,12 @@
 package usecase
 
 import (
+	"errors"
 	"practise-task-service/internal/models"
 	"practise-task-service/internal/storage"
 )
+
+const ErrNoResult = "результата нет"
 
 type OffloadService struct {
 	repo storage.PracticeGetter
@@ -33,18 +36,26 @@ func (s *OffloadService) Get(id int) (models.PracticeResponse, error) {
 }
 
 func (s *OffloadService) GetGroup() (models.PracticesInfo, error) {
-	info, err := s.repo.GetPracticeGroupInfo()
+	practicesInfo, err := s.repo.GetPracticeGroupInfo()
 	if err != nil {
 		return models.PracticesInfo{}, err
 	}
 
-	return info, nil
+	if len(practicesInfo) == 0 {
+		return models.PracticesInfo{}, errors.New(ErrNoResult)
+	}
+
+	return practicesInfo, nil
 }
 
 func (s *OffloadService) GetBySearch(title, subject string) (models.PracticesInfo, error) {
 	practicesInfo, err := s.repo.GetPracticeBySearch(title, subject)
 	if err != nil {
 		return models.PracticesInfo{}, err
+	}
+
+	if len(practicesInfo) == 0 {
+		return models.PracticesInfo{}, errors.New(ErrNoResult)
 	}
 
 	return practicesInfo, nil
