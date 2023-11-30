@@ -6,7 +6,7 @@ import (
 	"practise-task-service/internal/storage"
 )
 
-const ErrNoResult = "результата нет"
+var ErrNoResult = errors.New("нет результата")
 
 type OffloadService struct {
 	repo storage.PracticeGetter
@@ -42,7 +42,7 @@ func (s *OffloadService) GetGroup() (models.PracticesInfo, error) {
 	}
 
 	if len(practicesInfo) == 0 {
-		return models.PracticesInfo{}, errors.New(ErrNoResult)
+		return models.PracticesInfo{}, ErrNoResult
 	}
 
 	return practicesInfo, nil
@@ -55,7 +55,7 @@ func (s *OffloadService) GetBySearch(title, subject string) (models.PracticesInf
 	}
 
 	if len(practicesInfo) == 0 {
-		return models.PracticesInfo{}, errors.New(ErrNoResult)
+		return models.PracticesInfo{}, ErrNoResult
 	}
 
 	return practicesInfo, nil

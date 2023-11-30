@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/render"
 	"net/http"
 	"practise-task-service/internal/models"
+	"practise-task-service/internal/usecase"
 	"practise-task-service/pkg/error-response"
 	"strconv"
 	"strings"
@@ -16,6 +17,10 @@ const DocxExt = ".docx"
 func (h *Handler) GetAllPracticeTask() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		practices, err := h.service.PracticeGetter.GetGroup()
+		if errors.Is(err, usecase.ErrNoResult) {
+			error_response.New(w, r, http.StatusNoContent, err.Error())
+			return
+		}
 		if err != nil {
 			error_response.New(w, r, http.StatusInternalServerError, err.Error())
 			return
@@ -52,6 +57,10 @@ func (h *Handler) SearchPractice() http.HandlerFunc {
 		academicSubject := r.URL.Query().Get("item")
 
 		practicesInfo, err := h.service.PracticeGetter.GetBySearch(title, academicSubject)
+		if errors.Is(err, usecase.ErrNoResult) {
+			error_response.New(w, r, http.StatusNoContent, err.Error())
+			return
+		}
 		if err != nil {
 			error_response.New(w, r, http.StatusInternalServerError, err.Error())
 			return
