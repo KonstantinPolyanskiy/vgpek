@@ -39,6 +39,10 @@ func (h *Handler) GetPractice() http.HandlerFunc {
 		}
 
 		practice, err := h.service.PracticeGetter.Get(id)
+		if errors.Is(err, usecase.ErrNoResult) {
+			error_response.New(w, r, http.StatusNoContent, err.Error())
+			return
+		}
 		if err != nil {
 			error_response.New(w, r, http.StatusInternalServerError, "не удалось получить практическую")
 			return

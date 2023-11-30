@@ -24,6 +24,10 @@ func (s *OffloadService) Get(id int) (models.PracticeResponse, error) {
 		return models.PracticeResponse{}, err
 	}
 
+	if len(info.Author) == 0 {
+		return models.PracticeResponse{}, ErrNoResult
+	}
+
 	file, err := s.repo.GetPracticeFile(id)
 	if err != nil {
 		return models.PracticeResponse{}, err
